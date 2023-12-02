@@ -2,14 +2,10 @@
 
 class Day02
   def solve(lines)
-    p1 = lines.map do |line|
-      game_id, subsets = line.scan(/Game (\d+): (.+)/).flatten
-      next 0 if impossible?(subsets)
+    p1 = part1(lines)
+    p2 = part2(lines)
 
-      game_id.to_i
-    end.sum
-
-    [p1, -2]
+    [p1, p2]
   end
 
   private
@@ -20,6 +16,15 @@ class Day02
     'blue' => 14
   }.freeze
 
+  def part1(lines)
+    lines.map do |line|
+      game_id, subsets = line.scan(/Game (\d+): (.+)/).flatten
+      next 0 if impossible?(subsets)
+
+      game_id.to_i
+    end.sum
+  end
+
   def impossible?(subsets)
     subsets.split(';').each do |subset|
       subset.scan(/(\d+) (red|green|blue)/).each do |(count, cube)|
@@ -28,5 +33,25 @@ class Day02
     end
 
     false
+  end
+
+  def part2(lines)
+    lines.map do |line|
+      _game_id, subsets = line.scan(/Game (\d+): (.+)/).flatten
+
+      power(subsets)
+    end.sum
+  end
+
+  def power(subsets)
+    max_seen = { 'red' => 0, 'green' => 0, 'blue' => 0 }
+
+    subsets.split(';').each do |subset|
+      subset.scan(/(\d+) (red|green|blue)/).each do |(count, cube)|
+        max_seen[cube] = [count.to_i, max_seen[cube]].max
+      end
+    end
+
+    max_seen.values.reduce(:*)
   end
 end
