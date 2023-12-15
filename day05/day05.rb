@@ -11,19 +11,27 @@ class Day05
   private
 
   def part1
-    @seeds.map { |s| location(s) }.min
+    intervals = @seeds.map do |seed|
+      Interval.from_length(seed, 1)
+    end
+
+    min_location(intervals)
   end
 
   def part2
-    @seeds.each_slice(2).flat_map do |(start, length)|
-      start.upto(start + length - 1).map { |s| location(s) }
-    end.min
+    intervals = @seeds.each_slice(2).map do |(start, length)|
+      Interval.from_length(start, length)
+    end
+
+    min_location(intervals)
   end
 
-  def location(seed)
-    @mappings.reduce(seed) do |acc, mapping|
-      mapping.destination(acc)
+  def min_location(intervals)
+    intervals = @mappings.reduce(intervals) do |acc, mapping|
+      mapping.process(acc)
     end
+
+    intervals.map(&:left).min
   end
 
   def init_mappings(lines)
@@ -52,28 +60,72 @@ class Day05
       @ranges = []
     end
 
-    def destination(source)
-      ranges.each do |range|
-        return range.destination(source) if range.contains?(source)
+    def process(intervals)
+      @ranges.each do |range|
+        intervals = intervals.flat_map { |int| range.split(int) }
       end
 
-      source
+      intervals.map do |int|
+        adjust_interval(int)
+      end
+    end
+
+    private
+
+    def adjust_interval(interval)
+      @ranges.each do |range|
+        return range.adjust(interval) if range.contains?(interval.left)
+      end
+
+      interval
     end
   end
 
   class Range
     def initialize(destination, source, length)
-      @min = source
-      @max = source + length - 1
+      @source = Interval.from_length(source, length)
       @diff = destination - source
     end
 
-    def contains?(source)
-      @min <= source && source <= @max
+    def split(interval)
+      intersection = interval.intersection(@source)
+      return interval if intersection.nil?
+
+      result = [intersection]
+      result << Interval.new(interval.left, intersection.left - 1) if interval.left < intersection.left
+      result << Interval.new(intersection.right + 1, interval.right) if intersection.right < interval.right
+
+      result
     end
 
-    def destination(source)
-      source + @diff
+    def adjust(interval)
+      Interval.new(interval.left + @diff, interval.right + @diff)
+    end
+
+    def contains?(val)
+      @source.left <= val && val <= @source.right
+    end
+  end
+
+  class Interval
+    attr_accessor :left, :right
+
+    def self.from_length(start, length)
+      new(start, start + length - 1)
+    end
+
+    def initialize(left, right)
+      @left = left
+      @right = right
+    end
+
+    def intersection(other)
+      l = [@left, other.left].max
+      r = [@right, other.right].min
+
+      return if l > r
+
+      self.class.new(l, r)
     end
   end
 end
