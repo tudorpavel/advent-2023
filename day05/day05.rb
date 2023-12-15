@@ -2,36 +2,43 @@
 
 class Day05
   def solve(lines)
-    seeds = nums(lines[0])
-    mappings = init_mappings(lines)
+    @seeds = nums(lines[0])
+    init_mappings(lines)
 
-    p1 = seeds.map do |seed|
-      # reduce from seed to location
-      mappings.reduce(seed) do |acc, mapping|
-        mapping.destination(acc)
-      end
-    end.min
-
-    [p1, -2]
+    [part1, part2]
   end
 
   private
 
+  def part1
+    @seeds.map { |s| location(s) }.min
+  end
+
+  def part2
+    @seeds.each_slice(2).flat_map do |(start, length)|
+      start.upto(start + length - 1).map { |s| location(s) }
+    end.min
+  end
+
+  def location(seed)
+    @mappings.reduce(seed) do |acc, mapping|
+      mapping.destination(acc)
+    end
+  end
+
   def init_mappings(lines)
-    mappings = []
+    @mappings = []
 
     lines[2..].each do |line|
       next if line.empty?
 
       if line.end_with?(':')
-        mappings << Mapping.new
+        @mappings << Mapping.new
         next
       end
 
-      mappings.last.ranges << Range.new(*nums(line))
+      @mappings.last.ranges << Range.new(*nums(line))
     end
-
-    mappings
   end
 
   def nums(str)
