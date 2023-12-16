@@ -40,16 +40,21 @@ class Day06
       @record_distance = record_distance
     end
 
-    def record_beating_count
+    def record_beating_count # rubocop:disable Metrics/MethodLength
       min = 0
-      max = @time
+      max = @time / 2
 
-      while !beats_record?(min) && !beats_record?(max)
-        min += 1
-        max -= 1
+      while min < max - 1
+        mid = min + ((max - min) / 2)
+
+        if beats_record?(mid)
+          max = mid
+        else
+          min = mid
+        end
       end
 
-      max - min + 1
+      @time - (2 * max) + 1
     end
 
     private
