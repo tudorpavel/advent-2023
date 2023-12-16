@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
 class Day03
+  DELTA = [
+    [-1, -1], [-1, 0], [-1, 1],
+    [0, -1], [0, 1],
+    [1, -1], [1, 0], [1, 1]
+  ].freeze
+
   def initialize
     @components = {}
   end
@@ -12,21 +18,6 @@ class Day03
   end
 
   private
-
-  class Component
-    attr_accessor :symbol, :nums
-
-    def initialize(symbol)
-      @symbol = symbol
-      @nums = []
-    end
-  end
-
-  DELTA = [
-    [-1, -1], [-1, 0], [-1, 1],
-    [0, -1], [0, 1],
-    [1, -1], [1, 0], [1, 1]
-  ].freeze
 
   def part1
     @components.values.flat_map(&:nums).sum
@@ -77,5 +68,14 @@ class Day03
     end
 
     nil
+  end
+
+  class Component
+    attr_accessor :symbol, :nums
+
+    def initialize(symbol)
+      @symbol = symbol
+      @nums = []
+    end
   end
 end

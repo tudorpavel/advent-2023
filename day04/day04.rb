@@ -18,6 +18,22 @@ class Day04
 
   private
 
+  def part2(cards)
+    cards.each_with_index do |card, i|
+      next if card.win_count.zero?
+
+      cards[(i + 1)..(i + card.win_count)].each do |c|
+        c.add(card.card_count)
+      end
+    end
+
+    cards.map(&:card_count).sum
+  end
+
+  def nums(str)
+    str.scan(/(\d+)/).flatten.map(&:to_i)
+  end
+
   class Card
     attr_accessor :win_count, :card_count
 
@@ -29,21 +45,5 @@ class Day04
     def add(count)
       @card_count += count
     end
-  end
-
-  def nums(str)
-    str.scan(/(\d+)/).flatten.map(&:to_i)
-  end
-
-  def part2(cards)
-    cards.each_with_index do |card, i|
-      next if card.win_count.zero?
-
-      cards[(i + 1)..(i + card.win_count)].each do |c|
-        c.add(card.card_count)
-      end
-    end
-
-    cards.map(&:card_count).sum
   end
 end
