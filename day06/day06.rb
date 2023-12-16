@@ -2,21 +2,36 @@
 
 class Day06
   def solve(lines)
-    @races = nums(lines[0]).zip(nums(lines[1])).map do |(time, record_distance)|
-      Race.new(time, record_distance)
-    end
+    @lines = lines
 
-    [part1, -2]
-  end
-
-  def part1
-    @races.map(&:record_beating_count).reduce(:*)
+    [part1, part2]
   end
 
   private
 
+  def part1
+    races = nums(@lines[0]).zip(nums(@lines[1])).map do |(time, record_distance)|
+      Race.new(time, record_distance)
+    end
+
+    races.map(&:record_beating_count).reduce(:*)
+  end
+
+  def part2
+    race = Race.new(
+      one_num(nums(@lines[0])),
+      one_num(nums(@lines[1]))
+    )
+
+    race.record_beating_count
+  end
+
   def nums(str)
     str.scan(/(\d+)/).flatten.map(&:to_i)
+  end
+
+  def one_num(nums)
+    nums.map(&:to_s).join.to_i
   end
 
   class Race
