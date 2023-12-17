@@ -26,7 +26,7 @@ RSpec.describe Day09 do
       it 'returns the right result' do
         _p1, p2 = solve
 
-        expect(p2).to eq(-2)
+        expect(p2).to eq(2)
       end
     end
   end

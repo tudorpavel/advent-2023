@@ -2,27 +2,44 @@
 
 class Day09
   def solve(lines)
-    p1 = lines.map do |line|
-      next_value(nums(line))
-    end.sum
+    p1 = 0
+    p2 = 0
 
-    [p1, -2]
+    lines.each do |line|
+      initials, terminals = process(nums(line))
+      p1 += part1(terminals)
+      p2 += part2(initials)
+    end
+
+    [p1, p2]
   end
 
   private
 
-  def next_value(history)
+  def part1(terminals)
+    terminals.sum
+  end
+
+  def part2(initials)
+    initials.reverse.reduce(0) do |acc, n|
+      n - acc
+    end
+  end
+
+  def process(history) # rubocop:disable Metrics/MethodLength
+    initials = []
     terminals = []
     current = history
 
     until current.sum.zero?
+      initials << current.first
       terminals << current.last
       current = current.each_cons(2).map do |(a, b)|
         b - a
       end
     end
 
-    terminals.sum
+    [initials, terminals]
   end
 
   def nums(str)
